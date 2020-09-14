@@ -27,6 +27,7 @@ class _UnitConverter extends State<UnitConverter> {
   Unit _toUnit;
   List<DropdownMenuItem> _unitMenuItems;
   bool _showValidationError = false;
+  final _inputKey = GlobalKey(debugLabel: 'inputText');
 
   // ignore: todo
   // TODO: Determine whether you need to override anything, such as initState()
@@ -228,14 +229,29 @@ class _UnitConverter extends State<UnitConverter> {
       )
     );   
 
-    final converter = Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
+    final converter = ListView(
       children: [
         inputWidget,
         arrows,
         outputWidget,
       ],
     );
-    return Padding(padding: _padding, child: converter);
+    return Padding(
+      padding: _padding, 
+      child: OrientationBuilder(
+        builder: (BuildContext context, Orientation orientation) {
+          if(orientation==Orientation.portrait) {
+            return converter;
+          } else {
+            return Center(
+              child:  Container(
+                width: 450.0,
+                child: converter,
+              ),
+            );
+          }
+        },
+      ),
+    );
   }
 }
