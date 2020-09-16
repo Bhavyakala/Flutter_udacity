@@ -56,11 +56,9 @@ class CategoryTile extends StatelessWidget {
 
     return Material(
       color: Colors.transparent,
-
       child: Container(
         height: _rowHeight,
-        padding: EdgeInsets.all(8.0),
-
+        // padding: EdgeInsets.all(8.0),
         child : InkWell(
           splashColor: this.category.color['splash'],
           highlightColor: this.category.color['highlight'],
@@ -76,10 +74,7 @@ class CategoryTile extends StatelessWidget {
               children: [
                 Padding(
                   padding: EdgeInsets.all(16.0),   
-                  child: Icon(
-                    this.category.categoryIcon, 
-                    size: 60.0
-                  ),
+                  child: Image.asset(category.categoryIcon),
                 ),
 
                 Center(

@@ -8,12 +8,13 @@ class Category {
   final String categoryName;
   final ColorSwatch color;
   final List<Unit> units;
-  final categoryIcon;
+  final String categoryIcon;
   
   const Category({
     @required this.categoryName,
     @required this.categoryIcon,
-    @required this.units, this.color,
+    @required this.units, 
+    @required this.color,
   }): assert(categoryName!=null),
       assert(color!=null),
       assert(categoryIcon!=null),

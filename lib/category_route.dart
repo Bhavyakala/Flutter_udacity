@@ -20,17 +20,6 @@ class _CategoryRouteState extends State<CategoryRoute> {
   final _categories  = <Category>[];
   Category _currentCategory; 
   Category _defaultCategory;
-  
-  // static const _categoryNames = <String>[
-  //   'Length',
-  //   'Area',
-  //   'Volume',
-  //   'Mass',
-  //   'Time',
-  //   'Digital Storage',
-  //   'Energy',
-  //   'Currency',
-  // ];
 
   static const _baseColors = <ColorSwatch>[
     ColorSwatch(0xFF6AB7A8, {
@@ -68,6 +57,17 @@ class _CategoryRouteState extends State<CategoryRoute> {
     }),
   ];
 
+  static const _icons = <String>[
+    'assets/icons/length.png',
+    'assets/icons/area.png',
+    'assets/icons/volume.png',
+    'assets/icons/mass.png',
+    'assets/icons/time.png',
+    'assets/icons/digital_storage.png',
+    'assets/icons/power.png',
+    'assets/icons/currency.png',
+  ];
+   
   // @override 
   // @mustCallSuper
   // void initState() {
@@ -86,6 +86,7 @@ class _CategoryRouteState extends State<CategoryRoute> {
   //   }
   // } 
 
+  // ignore: todo
   // TODO: Uncomment this out. We use didChangeDependencies() so that we can
   // wait for our JSON asset to be loaded in (async).
   @override
@@ -113,7 +114,7 @@ class _CategoryRouteState extends State<CategoryRoute> {
       // print(units);
       var category  = Category(
         categoryName: key, 
-        categoryIcon: Icons.cake, 
+        categoryIcon: _icons[categoryIndex], 
         units: units,
         color: _baseColors[categoryIndex],
       );
