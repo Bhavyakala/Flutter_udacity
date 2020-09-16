@@ -4,8 +4,8 @@ import 'package:hello_rectangle/unit_converter.dart';
 import 'category.dart';
 import 'unit.dart';
 import 'backdrop.dart';
-
-final _backgroundColor = Colors.green[100];
+import 'dart:convert';
+import 'dart:async';
 
 class CategoryRoute extends StatefulWidget {
   const CategoryRoute();
@@ -20,34 +20,17 @@ class _CategoryRouteState extends State<CategoryRoute> {
   final _categories  = <Category>[];
   Category _currentCategory; 
   Category _defaultCategory;
-  @override 
-  @mustCallSuper
-  void initState() {
-    super.initState();
-    for(var i=0; i<_categoryNames.length; i++) {
-      var category = (Category(
-        categoryName: _categoryNames[i],
-        color: _baseColors[i],
-        categoryIcon: Icons.cake,
-        units: _retrieveUnitList(_categoryNames[i]),
-      ));
-      if(i==0) {
-        _defaultCategory = category;
-      }
-      _categories.add(category);
-    }
-  } 
   
-  static const _categoryNames = <String>[
-    'Length',
-    'Area',
-    'Volume',
-    'Mass',
-    'Time',
-    'Digital Storage',
-    'Energy',
-    'Currency',
-  ];
+  // static const _categoryNames = <String>[
+  //   'Length',
+  //   'Area',
+  //   'Volume',
+  //   'Mass',
+  //   'Time',
+  //   'Digital Storage',
+  //   'Energy',
+  //   'Currency',
+  // ];
 
   static const _baseColors = <ColorSwatch>[
     ColorSwatch(0xFF6AB7A8, {
@@ -85,15 +68,74 @@ class _CategoryRouteState extends State<CategoryRoute> {
     }),
   ];
 
-  List<Unit> _retrieveUnitList(String categoryName) {
-    return List.generate(10, (int i) {
-      i += 1;
-      return Unit(
-        name: '$categoryName Unit $i',
-        conversion: i.toDouble(),
-      );
-    });
+  // @override 
+  // @mustCallSuper
+  // void initState() {
+  //   super.initState();
+  //   for(var i=0; i<_categoryNames.length; i++) {
+  //     var category = (Category(
+  //       categoryName: _categoryNames[i],
+  //       color: _baseColors[i],
+  //       categoryIcon: Icons.cake,
+  //       units: _retrieveUnitList(_categoryNames[i]),
+  //     ));
+  //     if(i==0) {
+  //       _defaultCategory = category;
+  //     }
+  //     _categories.add(category);
+  //   }
+  // } 
+
+  // TODO: Uncomment this out. We use didChangeDependencies() so that we can
+  // wait for our JSON asset to be loaded in (async).
+  @override
+  Future<void> didChangeDependencies() async {
+    super.didChangeDependencies();
+    // We have static unit conversions located in our
+    // assets/data/regular_units.json
+    if (_categories.isEmpty) {
+      await _retrieveLocalCategories();
+    }
   }
+
+  Future<void> _retrieveLocalCategories() async {
+    final json  = DefaultAssetBundle
+                  .of(context)
+                  .loadString('assets/data/regular_units.json');
+    final data = JsonDecoder().convert(await json);
+    if(data is! Map) {
+      throw ("Data retrieved from API is not a Map");
+    }
+    var categoryIndex = 0;
+    for(var key in data.keys) {
+      // print(key);
+      final List<Unit> units = data[key].map<Unit>((dynamic data)=> Unit.fromJson(data)).toList();
+      // print(units);
+      var category  = Category(
+        categoryName: key, 
+        categoryIcon: Icons.cake, 
+        units: units,
+        color: _baseColors[categoryIndex],
+      );
+      setState(() {
+        if(categoryIndex==0) {
+          _defaultCategory = category;
+        } 
+        _categories.add(category);
+      });
+      categoryIndex+=1;
+    } 
+  }
+
+  // List<Unit> _retrieveUnitList(String categoryName) {
+  //   return List.generate(10, (int i) {
+  //     i += 1;
+  //     return Unit(
+  //       name: '$categoryName Unit $i',
+  //       conversion: i.toDouble(),
+  //     );
+  //   });
+  // }
   
   void _onCategoryTap(Category category) {
     setState(() {
