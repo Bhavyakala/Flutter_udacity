@@ -29,6 +29,7 @@ class _UnitConverter extends State<UnitConverter> {
   List<DropdownMenuItem> _unitMenuItems;
   bool _showValidationError = false;
   final _inputKey = GlobalKey(debugLabel: 'inputText');
+  bool _showErrorUI = false;
 
   // ignore: todo
   // TODO: Determine whether you need to override anything, such as initState()
@@ -99,16 +100,26 @@ class _UnitConverter extends State<UnitConverter> {
     if(widget.category.categoryName==apiCategory['name']) {
       final api = Api();
       val = await api.convert(
-        widget.category.categoryName, 
+        apiCategory['route'], 
         _inputValue.toString(), 
         _fromUnit.name, 
         _toUnit.name);
+      if(val==null) {
+        setState(() {
+          _showErrorUI = true;
+        });
+      } else {
+        setState(() {
+          _showErrorUI = false;
+          _convertedValue = _format(val);
+        });
+      }
     } else {
       val = _inputValue * (_toUnit.conversion / _fromUnit.conversion);
+      setState(() {
+        _convertedValue = _format(val);
+      });
     }
-    setState(() {
-      _convertedValue = _format(val);
-    });
   }
 
   void _updateInputValue(String input) {
@@ -185,6 +196,37 @@ class _UnitConverter extends State<UnitConverter> {
   @override
   Widget build(BuildContext context) {
 
+    if (widget.category.units == null ||
+        (widget.category.categoryName == apiCategory['name'] && _showErrorUI)) {
+      return SingleChildScrollView(
+        child: Container(
+          margin: _padding,
+          padding: _padding,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16.0),
+            color: widget.category.color['error'],
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.error_outline,
+                size: 180.0,
+                color: Colors.white,
+              ),
+              Text(
+                "Oh no! We can't connect right now!",
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.headline.copyWith(
+                      color: Colors.white,
+                    ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
     final inputWidget = Padding(
       padding: _padding,
       child: Column(
