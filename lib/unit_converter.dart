@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 import 'unit.dart';
 import 'category.dart';
+import 'api.dart';
 
 const _padding  = EdgeInsets.all(16.0);
 
@@ -93,9 +94,20 @@ class _UnitConverter extends State<UnitConverter> {
     return outputNum;
   }
 
-  void _updateConversion() {
+  Future<void> _updateConversion() async {
+    var val;
+    if(widget.category.categoryName==apiCategory['name']) {
+      final api = Api();
+      val = await api.convert(
+        widget.category.categoryName, 
+        _inputValue.toString(), 
+        _fromUnit.name, 
+        _toUnit.name);
+    } else {
+      val = _inputValue * (_toUnit.conversion / _fromUnit.conversion);
+    }
     setState(() {
-      _convertedValue = _format(_inputValue * (_toUnit.conversion / _fromUnit.conversion));
+      _convertedValue = _format(val);
     });
   }
 

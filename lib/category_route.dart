@@ -6,7 +6,7 @@ import 'unit.dart';
 import 'backdrop.dart';
 import 'dart:convert';
 import 'dart:async';
-
+import 'api.dart';
 class CategoryRoute extends StatefulWidget {
   const CategoryRoute();
   
@@ -96,7 +96,41 @@ class _CategoryRouteState extends State<CategoryRoute> {
     // assets/data/regular_units.json
     if (_categories.isEmpty) {
       await _retrieveLocalCategories();
+      await _retrieveApiCategory();
     }
+  }
+
+  Future<void> _retrieveApiCategory() async {
+
+    setState(() {
+      _categories.add(Category(
+        categoryName: apiCategory['name'],
+        units: [],
+        color: _baseColors.last,
+        categoryIcon: _icons.last,
+      ));
+    });
+
+    final api = Api();
+    final jsonUnits = await api.getUnits(apiCategory['route']);
+
+    if(jsonUnits!=null) {
+      final units = <Unit>[];
+      for(var unit in jsonUnits) {
+        units.add(Unit.fromJson(unit));
+      }
+      setState(() {
+        _categories.removeLast();
+        _categories.add(Category(
+          categoryName: apiCategory['name'], 
+          categoryIcon: _icons.last, 
+          units: units, 
+          color: _baseColors.last
+          )
+        );
+      });
+    }
+
   }
 
   Future<void> _retrieveLocalCategories() async {
